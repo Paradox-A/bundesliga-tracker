@@ -287,6 +287,9 @@ html = f"""<!doctype html>
   .wrap {{ max-width: 940px; margin: 0 auto; }}
   h1 {{ font-size: 1.6rem; margin-bottom: 4px; color: var(--accent); }}
   .updated {{ color: var(--muted); font-size: 0.85rem; margin-bottom: 18px; }}
+  .dash-link {{ margin-bottom: 10px; }}
+  .dash-link a {{ color: var(--muted); font-size: 0.8rem; text-decoration: none; }}
+  .dash-link a:hover {{ text-decoration: underline; color: var(--accent); }}
   .tabs {{ display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }}
   .tab-btn {{
     background: var(--tab-bg); color: var(--text); border: none; border-radius: 8px;
@@ -334,6 +337,7 @@ html = f"""<!doctype html>
 </head>
 <body>
 <div class="wrap">
+  <div class="dash-link"><a href="https://paradox-a.github.io/football-dashboard/">&larr; All Trackers (Dashboard)</a></div>
   <h1>Bundesliga 2026-27 Tracker</h1>
   <div class="updated">Matchday {matchday} · Last updated {updated}</div>
   {season_not_started_note}
