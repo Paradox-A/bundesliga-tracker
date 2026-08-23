@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bundesliga 2026-27 Tracker</title>
+<style>
+  :root {
+    --bg: #f6f1e7; --card: #ffffff; --text: #1a1a1a; --muted: #6b6b6b; --border: #e2ddd0;
+    --cl: #d6f5d6; --cl-text: #1a6b1a; --el: #d6e8ff; --el-text: #1a4a8a;
+    --ecl: #e0d6ff; --ecl-text: #4a1a8a; --relp: #ffe9c2; --relp-text: #8a5a1a;
+    --rel: #ffd6d6; --rel-text: #8a1a1a;
+    --accent: #d3010c; --tab-bg: #eee6d6; --tab-active: #d3010c; --tab-active-text: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #16131a; --card: #211d29; --text: #f0ede4; --muted: #a39d8f; --border: #3a3444;
+      --cl: #143d14; --cl-text: #8fe08f; --el: #143355; --el-text: #9cc4f5;
+      --ecl: #2e1a55; --ecl-text: #c9b3f5; --relp: #4a3410; --relp-text: #f5c98a;
+      --rel: #551a1a; --rel-text: #f5a3a3;
+      --accent: #ff5a63; --tab-bg: #2a2534; --tab-active: #ff5a63; --tab-active-text: #16131a;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #16131a; --card: #211d29; --text: #f0ede4; --muted: #a39d8f; --border: #3a3444;
+    --cl: #143d14; --cl-text: #8fe08f; --el: #143355; --el-text: #9cc4f5;
+    --ecl: #2e1a55; --ecl-text: #c9b3f5; --relp: #4a3410; --relp-text: #f5c98a;
+    --rel: #551a1a; --rel-text: #f5a3a3;
+    --accent: #ff5a63; --tab-bg: #2a2534; --tab-active: #ff5a63; --tab-active-text: #16131a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 24px 16px 60px; }
+  .wrap { max-width: 940px; margin: 0 auto; }
+  h1 { font-size: 1.6rem; margin-bottom: 4px; color: var(--accent); }
+  .updated { color: var(--muted); font-size: 0.85rem; margin-bottom: 18px; }
+  .tabs { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+  .tab-btn {
+    background: var(--tab-bg); color: var(--text); border: none; border-radius: 8px;
+    padding: 10px 16px; font-size: 0.9rem; font-weight: 600; cursor: pointer;
+  }
+  .tab-btn.active { background: var(--tab-active); color: var(--tab-active-text); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 20px; overflow-x: auto; }
+  h2 { font-size: 1.1rem; margin-top: 0; }
+  .intro { font-size: 0.88rem; color: var(--muted); margin-bottom: 16px; line-height: 1.5; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.85rem; white-space: nowrap; }
+  th, td { padding: 6px 8px; text-align: center; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; }
+  td.team, th.team { text-align: left; }
+  .crest { width: 16px; height: 16px; vertical-align: middle; margin-right: 6px; }
+  .pos { font-weight: 700; } .pts { font-weight: 700; }
+  tr.cl { background: var(--cl); color: var(--cl-text); }
+  tr.el { background: var(--el); color: var(--el-text); }
+  tr.ecl { background: var(--ecl); color: var(--ecl-text); }
+  tr.relp { background: var(--relp); color: var(--relp-text); }
+  tr.rel { background: var(--rel); color: var(--rel-text); }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 0.78rem; margin-top: 10px; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+  .dot.cl { background: var(--cl); } .dot.el { background: var(--el); }
+  .dot.ecl { background: var(--ecl); } .dot.relp { background: var(--relp); }
+  .dot.rel { background: var(--rel); }
+  .note { color: var(--muted); font-size: 0.8rem; margin-top: 8px; }
+  .explainer { background: var(--tab-bg); border-radius: 8px; padding: 10px 14px; font-size: 0.82rem; color: var(--text); margin-bottom: 12px; line-height: 1.5; }
+  .explainer b { color: var(--accent); }
+  footer { text-align: center; color: var(--muted); font-size: 0.75rem; margin-top: 30px; }
+  details.stat-accordion { border: 1px solid var(--border); border-radius: 10px; margin-bottom: 12px; overflow: hidden; }
+  details.stat-accordion summary {
+    cursor: pointer; padding: 14px 16px; font-weight: 700; font-size: 0.98rem;
+    list-style: none; display: flex; justify-content: space-between; align-items: center;
+    background: var(--card);
+  }
+  details.stat-accordion summary::-webkit-details-marker { display: none; }
+  details.stat-accordion summary::after { content: "+"; font-size: 1.2rem; color: var(--muted); }
+  details.stat-accordion[open] summary::after { content: "−"; }
+  details.stat-accordion summary .sub { font-weight: 400; font-size: 0.78rem; color: var(--muted); margin-top: 2px; display: block; }
+  details.stat-accordion .accordion-body { padding: 0 16px 16px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Bundesliga 2026-27 Tracker</h1>
+  <div class="updated">Matchday 1 · Last updated August 23, 2026 03:55 UTC</div>
+  <div class="note">⚠ The 2026-27 Bundesliga season hasn't kicked off yet (first matchday is August 28, 2026) — these sections will fill in once matches are played and the site is refreshed.</div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('table')">League Table</button>
+    <button class="tab-btn" onclick="showTab('club')">Club Stats</button>
+    <button class="tab-btn" onclick="showTab('player')">Player Stats</button>
+  </div>
+
+  <div id="tab-table" class="tab-panel active">
+    <div class="card">
+      <h2>League Table</h2>
+      <table>
+        <thead><tr><th>#</th><th class="team">Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th><th>Form</th></tr></thead>
+        <tbody>
+    <tr class="cl">
+      <td class="pos">1</td>
+      <td class="team"><img src="https://crests.football-data.org/1.png" alt="" class="crest"> 1. FC Köln</td>
+      <td>0</td><td>0</td><td>0</td><td>0</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="cl">
+      <td class="pos">2</td>
+      <td class="team"><img src="https://crests.football-data.org/28.png" alt="" class="crest"> Union Berlin</td>
+      <td>0</td><td>0</td><td>0</td><td>0</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="cl">
+      <td class="pos">3</td>
+      <td class="team"><img src="https://crests.football-data.org/15.png" alt="" class="crest"> Mainz</td>
+      <td>0</td><td>0</td><td>0</td><td>0</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="cl">
+      <td class="pos">4</td>
+      <td class="team"><img src="https://crests.football-data.org/2.png" alt="" class="crest"> Hoffenheim</td>
+      <td>0</td><td>0</td><td>0</td><td>0</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="el">
+      <td class="pos">5</td>
+      <td class="team"><img src="https://crests.football-data.org/3.png" alt="" class="crest"> Leverkusen</td>
+      <td>0</td><td>0</td><td>0</td><td>0</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="ecl">
+      <td class="pos">6</td>
+      <td class="team"><img src="https://crests.football-data.org/5.png" alt="" class="crest"> Bayern</td>
+      <td>0</td><td>0</td><td>0</td><td>0</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="">
+      <td class="pos">7</td>
+      <td class="team"><img src="https://crests.football-data.org/18.png" alt="" class="crest"> M'gladbach</td>
+      <td>0</td><td>0</td><td>0</td><td>0</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="">
+      <td class="pos">8</td>
+      <td class="team"><img src="https://crests.football-data.org/4.png" alt="" class="crest"> Dortmund</td>
+      <td>0</td><td>0</td><td>0</td><td>0</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="">
+      <td class="pos">9</td>
+      <td class="team"><img src="https://crests.football-data.org/19.png" alt="" class="crest"> Frankfurt</td>
+      <td>0</td><td>0</td><td>0</td><td>0</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="">
+      <td class="pos">10</td>
+      <td class="team"><img src="https://crests.football-data.org/16.png" alt="" class="crest"> Augsburg</td>
+      <td>0</td><td>0</td><td>0</td><td>0</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="">
+      <td class="pos">11</td>
+      <td class="team"><img src="https://crests.football-data.org/6.png" alt="" class="crest"> Schalke</td>
+      <td>0</td><td>0</td><td>0</td><td>0</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="">
+      <td class="pos">12</td>
+      <td class="team"><img src="https://crests.football-data.org/7.png" alt="" class="crest"> HSV</td>
+      <td>0</td><td>0</td><td>0</td><td>0</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="">
+      <td class="pos">13</td>
+      <td class="team"><img src="https://crests.football-data.org/721.png" alt="" class="crest"> RB Leipzig</td>
+      <td>0</td><td>0</td><td>0</td><td>0</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="">
+      <td class="pos">14</td>
+      <td class="team"><img src="https://crests.football-data.org/17.png" alt="" class="crest"> Freiburg</td>
+      <td>0</td><td>0</td><td>0</td><td>0</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="">
+      <td class="pos">15</td>
+      <td class="team"><img src="https://crests.football-data.org/29.png" alt="" class="crest"> SC Paderborn</td>
+      <td>0</td><td>0</td><td>0</td><td>0</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="relp">
+      <td class="pos">16</td>
+      <td class="team"><img src="https://crests.football-data.org/719.png" alt="" class="crest"> Elversberg</td>
+      <td>0</td><td>0</td><td>0</td><td>0</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="rel">
+      <td class="pos">17</td>
+      <td class="team"><img src="https://crests.football-data.org/10.png" alt="" class="crest"> Stuttgart</td>
+      <td>0</td><td>0</td><td>0</td><td>0</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="rel">
+      <td class="pos">18</td>
+      <td class="team"><img src="https://crests.football-data.org/12.png" alt="" class="crest"> Bremen</td>
+      <td>0</td><td>0</td><td>0</td><td>0</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr></tbody>
+      </table>
+      <div class="note"><b>P</b> Played &nbsp;·&nbsp; <b>W</b> Won &nbsp;·&nbsp; <b>D</b> Drawn &nbsp;·&nbsp; <b>L</b> Lost &nbsp;·&nbsp; <b>GF</b> Goals For &nbsp;·&nbsp; <b>GA</b> Goals Against &nbsp;·&nbsp; <b>GD</b> Goal Difference (GF minus GA — the first tiebreaker when teams are level on points) &nbsp;·&nbsp; <b>Pts</b> Points (3 for a win, 1 for a draw, 0 for a loss) &nbsp;·&nbsp; <b>Form</b> results of the last 5 games, oldest to newest</div>
+      <div class="legend">
+        <span><span class="dot cl"></span>Champions League (1-4)</span>
+        <span><span class="dot el"></span>Europa League (5)</span>
+        <span><span class="dot ecl"></span>Conference League (6)</span>
+        <span><span class="dot relp"></span>Relegation Play-off (16)</span>
+        <span><span class="dot rel"></span>Relegation (17-18)</span>
+      </div>
+      <div class="explainer"><b>New to the Bundesliga?</b> Unlike most leagues, 18th and 17th are relegated automatically, but <b>16th place gets a lifeline</b>: a two-legged play-off against the 3rd-place team from 2. Bundesliga (the second tier), with the Bundesliga side needing only a draw across both legs (on aggregate goals) to stay up since they have the away-goals-style tiebreak advantage as the higher-division club in a tie. European qualification spots can also shift based on cup-competition winners already qualifying via league position.</div>
+    </div>
+
+    <div class="card">
+      <h2>European Race</h2>
+      <table>
+        <thead><tr><th>#</th><th class="team">Team</th><th>Zone</th><th>Pts</th><th>Games Left</th><th>Gap to 4th</th></tr></thead>
+        <tbody>
+    <tr class="cl">
+      <td class="pos">1</td>
+      <td class="team"><img src="https://crests.football-data.org/1.png" alt="" class="crest"> 1. FC Köln</td>
+      <td>Champions League</td><td>0</td><td>34</td>
+      <td>—</td>
+    </tr>
+    <tr class="cl">
+      <td class="pos">2</td>
+      <td class="team"><img src="https://crests.football-data.org/28.png" alt="" class="crest"> Union Berlin</td>
+      <td>Champions League</td><td>0</td><td>34</td>
+      <td>—</td>
+    </tr>
+    <tr class="cl">
+      <td class="pos">3</td>
+      <td class="team"><img src="https://crests.football-data.org/15.png" alt="" class="crest"> Mainz</td>
+      <td>Champions League</td><td>0</td><td>34</td>
+      <td>—</td>
+    </tr>
+    <tr class="cl">
+      <td class="pos">4</td>
+      <td class="team"><img src="https://crests.football-data.org/2.png" alt="" class="crest"> Hoffenheim</td>
+      <td>Champions League</td><td>0</td><td>34</td>
+      <td>—</td>
+    </tr>
+    <tr class="el">
+      <td class="pos">5</td>
+      <td class="team"><img src="https://crests.football-data.org/3.png" alt="" class="crest"> Leverkusen</td>
+      <td>Europa League</td><td>0</td><td>34</td>
+      <td>Level with 4th</td>
+    </tr>
+    <tr class="ecl">
+      <td class="pos">6</td>
+      <td class="team"><img src="https://crests.football-data.org/5.png" alt="" class="crest"> Bayern</td>
+      <td>Conference League</td><td>0</td><td>34</td>
+      <td>Level with 4th</td>
+    </tr>
+    <tr class="">
+      <td class="pos">7</td>
+      <td class="team"><img src="https://crests.football-data.org/18.png" alt="" class="crest"> M'gladbach</td>
+      <td>Chasing pack</td><td>0</td><td>34</td>
+      <td>Level with 4th</td>
+    </tr>
+    <tr class="">
+      <td class="pos">8</td>
+      <td class="team"><img src="https://crests.football-data.org/4.png" alt="" class="crest"> Dortmund</td>
+      <td>Chasing pack</td><td>0</td><td>34</td>
+      <td>Level with 4th</td>
+    </tr></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Relegation Watch</h2>
+      <table>
+        <thead><tr><th>#</th><th class="team">Team</th><th>Pts</th><th>Games Left</th><th>What it takes to stay up</th></tr></thead>
+        <tbody>
+    <tr class="">
+      <td class="pos">13</td>
+      <td class="team"><img src="https://crests.football-data.org/721.png" alt="" class="crest"> RB Leipzig</td>
+      <td>0</td><td>34</td><td>Needs 34 pts from 34 games (1.00 pts/game pace)</td>
+    </tr>
+    <tr class="">
+      <td class="pos">14</td>
+      <td class="team"><img src="https://crests.football-data.org/17.png" alt="" class="crest"> Freiburg</td>
+      <td>0</td><td>34</td><td>Needs 34 pts from 34 games (1.00 pts/game pace)</td>
+    </tr>
+    <tr class="">
+      <td class="pos">15</td>
+      <td class="team"><img src="https://crests.football-data.org/29.png" alt="" class="crest"> SC Paderborn</td>
+      <td>0</td><td>34</td><td>Needs 34 pts from 34 games (1.00 pts/game pace)</td>
+    </tr>
+    <tr class="relp">
+      <td class="pos">16</td>
+      <td class="team"><img src="https://crests.football-data.org/719.png" alt="" class="crest"> Elversberg</td>
+      <td>0</td><td>34</td><td>Needs 34 pts from 34 games (1.00 pts/game pace)</td>
+    </tr>
+    <tr class="rel">
+      <td class="pos">17</td>
+      <td class="team"><img src="https://crests.football-data.org/10.png" alt="" class="crest"> Stuttgart</td>
+      <td>0</td><td>34</td><td>Needs 34 pts from 34 games (1.00 pts/game pace)</td>
+    </tr>
+    <tr class="rel">
+      <td class="pos">18</td>
+      <td class="team"><img src="https://crests.football-data.org/12.png" alt="" class="crest"> Bremen</td>
+      <td>0</td><td>34</td><td>Needs 34 pts from 34 games (1.00 pts/game pace)</td>
+    </tr></tbody>
+      </table>
+      <div class="note">"Safety" modeled as ~34 points, a rough historical Bundesliga survival benchmark. 16th place isn't necessarily safe even above this line — see the play-off note above.</div>
+    </div>
+  </div>
+
+  <div id="tab-club" class="tab-panel">
+    <div class="explainer">
+      <b>New to the Bundesliga?</b> The table tells you <i>where</i> a team stands, but not <i>how</i> they got there. These stats show the underlying strengths and weaknesses — a team can have a good record while quietly being fragile defensively, or vice versa.
+    </div>
+
+    <div class="card">
+      <h2>Defensive Strength: Clean Sheets</h2>
+      <div class="explainer">A <b>clean sheet</b> is a game where a team doesn't concede at all. It's the single clearest sign of defensive solidity — Bundesliga title winners are almost always among the league's clean-sheet leaders, because you can't lose a game you don't concede in.</div>
+      <table>
+        <thead><tr><th class="team">Team</th><th>Played</th><th>Clean Sheets</th><th>Goals Conceded / Game</th><th>Failed to Score</th></tr></thead>
+        <tbody><tr><td colspan=5>No finished matches yet</td></tr></tbody>
+      </table>
+      <div class="note"><b>Failed to Score</b> counts games where a team didn't score at all — a blunt but telling sign of attacking struggles.</div>
+    </div>
+
+    <div class="card">
+      <h2>Home Fortress vs. Road Warriors</h2>
+      <div class="explainer">Some teams are much stronger at home than away (or the reverse) — this is one of the oldest storylines in football, and the Bundesliga is famous for it given the size and atmosphere of grounds like Dortmund's Signal Iduna Park. <b>Points per game (PPG)</b> at home vs. away shows exactly how lopsided that split is. <b>Form</b> is the last 5 results (most recent last) — a better read on momentum than the season-long record.</div>
+      <table>
+        <thead><tr><th class="team">Team</th><th>Form (last 5)</th><th>Home Record</th><th>Away Record</th></tr></thead>
+        <tbody><tr><td colspan=4>No finished matches yet</td></tr></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Biggest Wins &amp; Heaviest Losses</h2>
+      <div class="explainer">Goal margin matters beyond the 3 points — a big win boosts goal difference (which breaks ties in the table) and can be a statement result against a rival, especially in Der Klassiker (Bayern vs. Dortmund) or a regional derby.</div>
+      <div style="display:flex; gap:16px; flex-wrap:wrap;">
+        <table style="flex:1; min-width:220px;">
+          <thead><tr><th class="team">Team</th><th>Biggest Win</th></tr></thead>
+          <tbody><tr><td colspan='2'>Not enough results yet</td></tr></tbody>
+        </table>
+        <table style="flex:1; min-width:220px;">
+          <thead><tr><th class="team">Team</th><th>Heaviest Loss</th></tr></thead>
+          <tbody><tr><td colspan='2'>Not enough results yet</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="note" style="margin-top: -8px;">Not shown: possession, shots, passing accuracy, tackles, or expected goals (xG) — these require a paid data source. Everything above is derived directly from final match scores.</div>
+  </div>
+
+  <div id="tab-player" class="tab-panel">
+    <div class="explainer">
+      <b>New to the Bundesliga?</b> The top scorer title doesn't have as iconic a name as the Premier League's Golden Boot or LaLiga's Pichichi, but it's followed just as closely. Goals alone don't capture everything a player contributes — this table adds context.
+    </div>
+    <div class="note">⚠ The 2026-27 Bundesliga season hasn't kicked off yet (first matchday is August 28, 2026) — these sections will fill in once matches are played and the site is refreshed.</div>
+    <div class="card">
+      <h2>Top Scorer Race &amp; Goal Involvements</h2>
+      <div class="explainer">
+        <b>Goals</b>: the headline number, and what decides the top scorer title.<br>
+        <b>Assists</b>: the pass that directly leads to a goal — a measure of creativity, not just finishing.<br>
+        <b>Goal Involvements</b> (goals + assists): a fuller picture of a player's attacking output — a player with 8 goals and 10 assists is arguably more valuable than one with 12 goals and 0 assists.<br>
+        <b>Goals/Game</b>: raw totals favor players who've played more games — this rate stat levels the comparison.<br>
+        <b>Penalties</b>: shown separately since penalty goals are viewed differently from open-play goals (some fans discount them when judging a striker's true quality).
+      </div>
+      <table><thead><tr><th class="team">Player</th><th>Club</th><th>Games</th><th>Goals</th><th>Assists</th><th>Goal Inv.</th><th>Pens</th><th>Goals/Game</th></tr></thead><tbody><tr><td colspan=8>No scorer data yet</td></tr></tbody></table>
+      <div class="note">⚠ No scorer data yet — the 2026-27 season hasn't kicked off. This table will populate once matches are played and the site is refreshed.</div>
+      <div class="note">Not shown: shots, expected goals (xG), key passes, dribbles, or tackles — this combined table's data source only tracks goals, assists, penalties, and appearances. Deeper stats (like xG) require a paid provider.</div>
+    </div>
+
+    <div class="explainer" style="margin-top: 4px;">
+      <b>Want just one ranking at a time?</b> The sections below pull real numbers directly from Bundesliga.com's own stats hub — Goals, Assists, Yellow Cards, and (for goalkeepers) Shots Saved.
+    </div>
+
+    <details class="stat-accordion">
+      <summary>Most Goals <span class="sub">The top scorer race — decided by goals alone, nothing else</span></summary>
+      <div class="accordion-body">
+        <div class="explainer"><b>Goals</b> is the headline number and what the top scorer title is decided by. It's the most-watched individual stat in the league, but it rewards finishers over creators — see "Most Assists" below for the fuller picture.</div>
+        <table><thead><tr><th class="team">Player</th><th>Club</th><th>Goals</th></tr></thead><tbody><tr><td colspan=3>No data yet — season hasn't started</td></tr></tbody></table>
+      </div>
+    </details>
+
+    <details class="stat-accordion">
+      <summary>Most Assists <span class="sub">Who's creating goals for others, not just scoring them</span></summary>
+      <div class="accordion-body">
+        <div class="explainer"><b>Assists</b> credit the pass (or occasionally the touch) that directly leads to a goal. It's the clearest single measure of creativity — a player can be hugely valuable to a team's attack without scoring much themselves.</div>
+        <table><thead><tr><th class="team">Player</th><th>Club</th><th>Assists</th></tr></thead><tbody><tr><td colspan=3>No data yet — season hasn't started</td></tr></tbody></table>
+      </div>
+    </details>
+
+    <details class="stat-accordion">
+      <summary>Most Yellow Cards <span class="sub">Discipline — persistent fouling, five in a season triggers an automatic ban</span></summary>
+      <div class="accordion-body">
+        <div class="explainer">A <b>yellow card</b> is a caution for a foul or unsporting behavior. Two in one match means a red card and an early shower. Accumulate enough yellows across the season and the player serves an automatic one-match ban — so this list is also a rough guide to who's one bad tackle away from missing a game.</div>
+        <table><thead><tr><th class="team">Player</th><th>Club</th><th>Yellow Cards</th></tr></thead><tbody><tr><td colspan=3>No data yet — season hasn't started</td></tr></tbody></table>
+      </div>
+    </details>
+
+    <details class="stat-accordion">
+      <summary>Most Shots Saved <span class="sub">The clearest individual goalkeeper stat — stops made, regardless of team result</span></summary>
+      <div class="accordion-body">
+        <div class="explainer">Unlike a team clean sheet (which depends on the whole defense), <b>shots saved</b> credits the goalkeeper directly for stops made, win or lose. A keeper can rack up saves behind a leaky defense just as easily as behind a strong one — it measures individual shot-stopping, not team results.</div>
+        <table><thead><tr><th class="team">Player</th><th>Club</th><th>Shots Saved</th></tr></thead><tbody><tr><td colspan=3>No data yet — season hasn't started</td></tr></tbody></table>
+      </div>
+    </details>
+
+    <div class="note">No dedicated Red Cards ranking is included — Bundesliga.com's own stats hub doesn't publish one (red cards are rare enough that the site folds them into a combined "Cards" tally instead of breaking them out separately), and no other free source was found for this competition.</div>
+  </div>
+
+  <footer>Data: football-data.org &amp; bundesliga.com · Rebuilt periodically, not live-updating</footer>
+</div>
+<script>
+function showTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
